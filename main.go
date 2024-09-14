@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"rss-aggregator/internal/database"
+	"time"
 )
 
 type apiConfig struct {
@@ -35,9 +36,12 @@ func main() {
 		log.Fatal("Cant connect to database:", err)
 	}
 
+	db := database.New(conn)
 	apiCfg := apiConfig{
-		DB: database.New(conn),
+		DB: db,
 	}
+
+	go startScraping(db, 10, time.Minute)
 
 	router := chi.NewRouter()
 
